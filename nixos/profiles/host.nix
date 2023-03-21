@@ -1,7 +1,8 @@
-{ lib, hostname }:
+{ lib, hostname, ... }:
 
 let
-  inherit (lib) hashString mkDefault substring;
+  inherit (builtins) hashString;
+  inherit (lib) mkDefault substring;
 
 in {
   networking.hostName = mkDefault hostname;

@@ -1,7 +1,7 @@
 { lib, config, pkgs, flake, hostname, ... }:
 
 let
-  inherit (lib) concatMapStrings imap1 mkAfter mkDefault mkEnableOption mkIf mkMerge mkOption mkOrder optional optionalString types;
+  inherit (lib) concatMapStrings imap1 mkAfter mkDefault mkEnableOption mkIf mkMerge mkOption mkOrder optional optionalString singleton types;
   inherit (flake.lib) lines' nonl setFailFast;
 
   cfg = config.setup;
@@ -25,15 +25,21 @@ let
   devOffset = if isBiosGpt then 1 else 0;
   dev = n: cfg.device + optionalString cfg.enableNvme "p" + toString (devOffset + n);
 
-  setDevVars = nonl (if cfg.enableEncryption then ''
-    boot_dev=${dev 1}
-    swap_dev=/dev/${cfg.poolName}/swap
-    root_dev=/dev/${cfg.poolName}/root
-  '' else ''
-    boot_dev=${dev 1}
-    swap_dev=${dev 2}
-    root_dev=${dev 3}
-  '');
+  devices = if cfg.enableEncryption then {
+    boot = dev 1;
+    swap = "/dev/${cfg.poolName}/swap";
+    root = "/dev/${cfg.poolName}/root";
+  } else {
+    boot = dev 1;
+    swap = dev 2;
+    root = dev 3;
+  };
+
+  setDevVars = nonl ''
+    boot_dev=${devices.boot}
+    swap_dev=${devices.swap}
+    root_dev=${devices.root}
+  '';
 
   mountDevs = ''
     echo "Mount the file systems..." >&2
@@ -45,6 +51,7 @@ let
     mount "$boot_dev" /mnt/boot
 
     # TODO: Detect if it is safe to do so.
+    # (( $(swapon --show=type --noheadings | wc -l) > 0 ))
     # swapon "$swap_dev"
 
     mkdir -p /mnt/{home,nix}
@@ -111,6 +118,29 @@ in {
         } else {
           grub = { inherit (cfg) device; };
         };
+
+        fileSystems = mkDefault {
+          "/" = {
+            device = "${cfg.poolName}/system/nixos";
+            fsType = "zfs";
+          };
+          "/boot" = {
+            device = dev 1;
+            fsType = if cfg.firmware == "uefi" then "vfat" else "ext2";
+          };
+          "/home" = {
+            device = "${cfg.poolName}/user/home";
+            fsType = "zfs";
+          };
+          "/nix" = {
+            device = "${cfg.poolName}/cache/nix";
+            fsType = "zfs";
+          };
+        };
+
+        swapDevices = mkDefault (singleton {
+          device = devices.swap;
+        });
       })
       {
         boot.initrd.luks.devices.root = mkIf cfg.enableEncryption {
@@ -237,7 +267,7 @@ in {
           (mkAfter ''
             echo "Create SSH config for users..." >&2
             ${concatMapStrings (user: ''
-              mkdir -p /mnt/home/${user}/.ssh
+              mkdir -p /mnt/home/${user}/.ssh/config.d
               chmod -R 700 /mnt/home/${user}
               echo 'Include config.d/*' > /mnt/home/${user}/.ssh/config
               chmod 600 /mnt/home/${user}/.ssh/config
@@ -260,7 +290,11 @@ in {
           '')
         ];
 
-        setup.mountScript = mountDevs;
+        setup.mountScript = ''
+          ${setFailFast}
+          ${setDevVars}
+          ${mountDevs}
+        '';
 
         system.build.setup-nixos-install = pkgs.writeShellScript "setup-nixos-install.sh" cfg.script;
         system.build.mount-nixos-install = pkgs.writeShellScript "mount-nixos-install.sh" cfg.mountScript;
