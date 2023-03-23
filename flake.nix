@@ -5,7 +5,7 @@
     nixcfg.url = "github:msteen/nixcfg";
   };
 
-  outputs = inputs: inputs.nixcfg.lib.mkFlake {
+  outputs = inputs: inputs.nixcfg.lib.mkNixcfg {
     name = "public";
     path = ./.;
     inherit inputs;

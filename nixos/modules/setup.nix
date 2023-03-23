@@ -1,8 +1,8 @@
-{ lib, config, pkgs, flake, hostname, ... }:
+{ lib, config, pkgs, nixcfg, hostname, ... }:
 
 let
   inherit (lib) concatMapStrings imap1 mkAfter mkDefault mkEnableOption mkIf mkMerge mkOption mkOrder optional optionalString singleton types;
-  inherit (flake.lib) lines' nonl setFailFast;
+  inherit (nixcfg.lib) lines' nonl setFailFast;
 
   cfg = config.setup;
   label = if cfg.enableWindowsSupport && cfg.firmware == "bios" then "mbr" else "gpt";
@@ -119,7 +119,7 @@ in {
           grub = { inherit (cfg) device; };
         };
 
-        fileSystems = mkDefault {
+        fileSystems = {
           "/" = {
             device = "${cfg.poolName}/system/nixos";
             fsType = "zfs";
@@ -138,9 +138,9 @@ in {
           };
         };
 
-        swapDevices = mkDefault (singleton {
+        swapDevices = singleton {
           device = devices.swap;
-        });
+        };
       })
       {
         boot.initrd.luks.devices.root = mkIf cfg.enableEncryption {
@@ -281,9 +281,6 @@ in {
 
             echo "Generate NixOS hardware configuration..." >&2
             nixos-generate-config --root /mnt
-            # FIXME: Target doesn't exist yet!
-            # mv /mnt/etc/nixos/hardware-configuration.nix /mnt/cfg/${config.users.admin}/nixos/hosts/${hostname}/config/hardware-generated.nix
-            ln -sfT /cfg/${config.users.admin}/flake.nix /mnt/etc/nixos/flake.nix
 
             echo "Printing public SSH key of admin..." >&2
             cat /mnt/home/${config.users.admin}/.ssh/id_ed25519.pub
