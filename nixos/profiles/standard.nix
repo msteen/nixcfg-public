@@ -1,4 +1,4 @@
-{pkgs, nixcfg, ...}:
+{ pkgs, nixcfg, ... }:
 
 {
   environment.systemPackages = nixcfg.data.standardPkgs;
