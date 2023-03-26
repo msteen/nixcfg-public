@@ -1,7 +1,7 @@
-{ lib, config, ... }:
+{ lib, config, pkgs, ... }:
 
 let
-  inherit (builtins) attrValeus;
+  inherit (builtins) attrValues;
   inherit (lib) mkDefault;
 
 in {
@@ -11,12 +11,9 @@ in {
     layout = mkDefault "us";
     xkbVariant = mkDefault "euro";
     xkbOptions = mkDefault "compose:menu";
-    displayManager = {
-      lightdm.enable = true;
-      autoLogin = {
-        enable = true;
-        autoLogin.user = mkDefault config.users.admin;
-      };
+    displayManager.autoLogin = {
+      enable = true;
+      user = mkDefault config.users.admin;
     };
   };
 

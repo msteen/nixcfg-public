@@ -1,7 +1,8 @@
-{ lib, ... }:
+{ lib, config, ... }:
 
 let
-  inherit (lib) mkOption;
+  inherit (builtins) listToAttrs;
+  inherit (lib) const genAttrs mkIf mkMerge mkOption nameValuePair optional;
 
   cfg = config.users;
 
@@ -15,8 +16,8 @@ in {
     };
 
     admins = mkOption {
-      default = [];
       type = listOf str;
+      default = [];
       description = ''
         List of admin user names.
       '';
@@ -24,6 +25,7 @@ in {
 
     realNames = mkOption {
       type = listOf str;
+      default = map ({ name, ... }: name) cfg.realUsers;
       description = ''
         List of real user (i.e. person) names.
       '';
@@ -50,8 +52,32 @@ in {
     };
   };
 
-  config = mkIf (cfg.adminUsers != []) {
-    users.users = genAttrs cfg.adminUsers (const { extraGroups = [ "wheel" ]; });
-    nix.trustedUsers = cfg.adminUsers;
-  };
+  config = mkMerge [
+    (mkIf (cfg.admins != []) {
+      users.users = genAttrs cfg.admins (const { extraGroups = [ "wheel" ]; });
+      nix.settings.trusted-users = cfg.admins;
+    })
+    {
+      users.groups = listToAttrs (map ({ id, name, ... }: nameValuePair name {
+        gid = id;
+        inherit name;
+      }) cfg.realUsers);
+
+      users.users = listToAttrs (map ({ id, name, ... }: nameValuePair name {
+        isNormalUser = true;
+        uid = id;
+        inherit name;
+        group = name;
+        extraGroups = [
+          "audio"
+          "sshusers"
+          "users"
+          "video"
+        ] ++ optional config.networking.networkmanager.enable "networkmanager";
+        initialPassword = "test"; # FIXME!
+        home = "/home/${name}";
+        useDefaultShell = true;
+      }) cfg.realUsers);
+    }
+  ];
 }
