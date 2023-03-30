@@ -25,7 +25,7 @@ in {
 
     realNames = mkOption {
       type = listOf str;
-      default = map ({ name, ... }: name) cfg.realUsers;
+      default = []; #map ({ name, ... }: name) cfg.realUsers;
       description = ''
         List of real user (i.e. person) names.
       '';
@@ -50,10 +50,11 @@ in {
         };
       });
     };
+    default = [ ];
   };
 
   config = mkMerge [
-    (mkIf (cfg.admins != []) {
+    (mkIf (cfg.admins != [ ]) {
       users.users = genAttrs cfg.admins (const { extraGroups = [ "wheel" ]; });
       nix.settings.trusted-users = cfg.admins;
     })

@@ -1,4 +1,4 @@
-{ lib, config, pkgs, nixcfg, hostname, ... }:
+{ lib, config, pkgs, nixcfg, ... }:
 
 let
   inherit (lib) concatMapStrings imap1 mkAfter mkDefault mkEnableOption mkIf mkMerge mkOption mkOrder optional optionalString singleton types;
@@ -271,7 +271,7 @@ in {
               chmod -R 700 /mnt/home/${user}
               echo 'Include config.d/*' > /mnt/home/${user}/.ssh/config
               chmod 600 /mnt/home/${user}/.ssh/config
-              ssh-keygen -t ed25519 -o -a 128 -C '${user}@${hostname}' -f /mnt/home/${user}/.ssh/id_ed25519 -N '''
+              ssh-keygen -t ed25519 -o -a 128 -C '${user}@${config.networking.hostName}' -f /mnt/home/${user}/.ssh/id_ed25519 -N '''
             '') ([ "root" "wheel" ] ++ config.users.realNames)}
 
             echo "Fix ownership of directories..." >&2
