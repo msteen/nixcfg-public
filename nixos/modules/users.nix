@@ -25,7 +25,7 @@ in {
 
     realNames = mkOption {
       type = listOf str;
-      default = []; #map ({ name, ... }: name) cfg.realUsers;
+      default = map ({ name, ... }: name) cfg.realUsers;
       description = ''
         List of real user (i.e. person) names.
       '';
@@ -49,8 +49,8 @@ in {
           };
         };
       });
+      default = [ ];
     };
-    default = [ ];
   };
 
   config = mkMerge [
