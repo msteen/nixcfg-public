@@ -1,6 +1,13 @@
-final: prev: with final; {
-  applyIf = b: f: x: if b then f x else x;
-  notNullOr = default: value: if value != null then value else default;
+final: prev:
+with final; {
+  applyIf = b: f: x:
+    if b
+    then f x
+    else x;
+  notNullOr = default: value:
+    if value != null
+    then value
+    else default;
 
   setFailFast = "set -euo pipefail";
 

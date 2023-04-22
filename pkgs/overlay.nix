@@ -1,4 +1,5 @@
-final: prev: with final; {
+final: prev:
+with final; {
   shellScriptAttrs = attrs: builtins.mapAttrs (name: writeShellScript "${name}.sh");
 
   xtdb = xtdbInMemory;

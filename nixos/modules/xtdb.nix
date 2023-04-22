@@ -1,30 +1,33 @@
-{ lib, config, pkgs, ... }:
-
-let
+{
+  lib,
+  config,
+  pkgs,
+  ...
+}: let
   inherit (builtins) attrNames isAttrs listToAttrs;
 
-  recursiveUpdateNames = f: attrs: listToAttrs (map (name: {
-    name = f name;
-    value = let
-      value = attrs.${name};
-    in
-      if isAttrs value
-      then recursiveUpdateNames f value
-      else value;
-  }) (attrNames attrs));
-
+  recursiveUpdateNames = f: attrs:
+    listToAttrs (map (name: {
+      name = f name;
+      value = let
+        value = attrs.${name};
+      in
+        if isAttrs value
+        then recursiveUpdateNames f value
+        else value;
+    }) (attrNames attrs));
 in let
   inherit (builtins) replaceStrings toFile toJSON;
   inherit (lib) mkDoc mkEnableOption mkIf mkOption;
 
   cfg = config.services.xtdb;
 
-  configurationFile = toFile "configuration.json" (toJSON (recursiveUpdateNames (name: replaceStrings ["_"] ["/"] name) cfg.configuration));
-
+  configurationFile = toFile "configuration.json" (toJSON (recursiveUpdateNames (name: replaceStrings [ "_" ] [ "/" ] name) cfg.configuration));
   # TODO: Environment
-
 in {
-  options.services.xtdb = let inherit (lib.types) attrs package path; in {
+  options.services.xtdb = let
+    inherit (lib.types) attrs package path;
+  in {
     enable = mkEnableOption "XTDB";
 
     workDir = mkOption {

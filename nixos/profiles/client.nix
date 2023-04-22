@@ -1,9 +1,11 @@
-{ lib, config, pkgs, ... }:
-
-let
+{
+  lib,
+  config,
+  pkgs,
+  ...
+}: let
   inherit (builtins) attrValues;
   inherit (lib) mkDefault;
-
 in {
   services.xserver = {
     enable = true;

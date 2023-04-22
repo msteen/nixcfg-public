@@ -1,1 +1,6 @@
-{ pkgs }: builtins.attrValues { inherit (pkgs) micro; }
+{ pkgs }: let
+  inherit (builtins)
+    attrValues
+    ;
+in
+  attrValues { inherit (pkgs) micro wl-clipboard xclip; }
