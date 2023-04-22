@@ -1,0 +1,158 @@
+{
+  "nodes": {
+    "extra-container": {
+      "inputs": {
+        "flake-utils": "flake-utils",
+        "nixpkgs": [
+          "nixos-unstable"
+        ]
+      },
+      "locked": {
+        "lastModified": 1679648217,
+        "narHash": "sha256-aq2J5Hj5IE8X8X/7v3n0wcv8n+FLzzENbcCF9xqhxAc=",
+        "owner": "erikarvstedt",
+        "repo": "extra-container",
+        "rev": "40c73f5e3292e73d6ce91625d9751be84fde17cb",
+        "type": "github"
+      },
+      "original": {
+        "owner": "erikarvstedt",
+        "repo": "extra-container",
+        "type": "github"
+      }
+    },
+    "flake-utils": {
+      "locked": {
+        "lastModified": 1667395993,
+        "narHash": "sha256-nuEHfE/LcWyuSWnS8t12N1wc105Qtau+/OdUAjtQ0rA=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "5aed5285a952e0b949eb3ba02c12fa4fcfef535f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
+    "home-manager": {
+      "inputs": {
+        "nixpkgs": [
+          "nixos-stable"
+        ],
+        "utils": [
+          "extra-container",
+          "flake-utils"
+        ]
+      },
+      "locked": {
+        "lastModified": 1681092193,
+        "narHash": "sha256-JerCqqOqbT2tBnXQW4EqwFl0hHnuZp21rIQ6lu/N4rI=",
+        "owner": "nix-community",
+        "repo": "home-manager",
+        "rev": "f9edbedaf015013eb35f8caacbe0c9666bbc16af",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "ref": "release-22.11",
+        "repo": "home-manager",
+        "type": "github"
+      }
+    },
+    "nixcfg": {
+      "inputs": {
+        "nixpkgs": [
+          "nixos-unstable"
+        ]
+      },
+      "locked": {
+        "lastModified": 1682181399,
+        "narHash": "sha256-xaIIVBSeuipfRISPE+PvUZXMcj5ZoqkqKiiOxEj8/kc=",
+        "owner": "msteen",
+        "repo": "nixcfg.lib",
+        "rev": "7a9620b993ca37c7c1a70c4f1a61849b834dcde4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "msteen",
+        "repo": "nixcfg.lib",
+        "type": "github"
+      }
+    },
+    "nixos-22_11": {
+      "locked": {
+        "lastModified": 1682134069,
+        "narHash": "sha256-TnI/ZXSmRxQDt2sjRYK/8j8iha4B4zP2cnQCZZ3vp7k=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "fd901ef4bf93499374c5af385b2943f5801c0833",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-22.11",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixos-unstable": {
+      "locked": {
+        "lastModified": 1681920287,
+        "narHash": "sha256-+/d6XQQfhhXVfqfLROJoqj3TuG38CAeoT6jO1g9r1k0=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "645bc49f34fa8eff95479f0345ff57e55b53437e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "extra-container": "extra-container",
+        "home-manager": "home-manager",
+        "nixcfg": "nixcfg",
+        "nixos-22_11": "nixos-22_11",
+        "nixos-stable": [
+          "nixos-22_11"
+        ],
+        "nixos-unstable": "nixos-unstable",
+        "nixpkgs": [
+          "nixos-stable"
+        ],
+        "sops-nix": "sops-nix"
+      }
+    },
+    "sops-nix": {
+      "inputs": {
+        "nixpkgs": [
+          "nixos-unstable"
+        ],
+        "nixpkgs-stable": [
+          "nixos-stable"
+        ]
+      },
+      "locked": {
+        "lastModified": 1681821695,
+        "narHash": "sha256-uwyBGo/9IALi97AfMuzkJroQQhV6hkybaZVdw6pRNG4=",
+        "owner": "Mic92",
+        "repo": "sops-nix",
+        "rev": "5698b06b0731a2c15ff8c2351644427f8ad33993",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Mic92",
+        "repo": "sops-nix",
+        "type": "github"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}
