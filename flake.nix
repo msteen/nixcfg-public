@@ -10,12 +10,12 @@
 
     nixcfg = {
       url = "github:msteen/nixcfg.lib";
-      inputs.nixpkgs.follows = "nixos-unstable";
+      inputs.nixpkgs.follows = "nixos-stable";
     };
 
     extra-container = {
       url = "github:erikarvstedt/extra-container";
-      inputs.nixpkgs.follows = "nixos-unstable";
+      inputs.nixpkgs.follows = "nixos-stable";
     };
 
     home-manager = {
