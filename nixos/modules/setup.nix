@@ -39,8 +39,8 @@
     if cfg.enableEncryption
     then {
       boot = dev 1;
-      swap = "/dev/${cfg.poolName}/swap";
-      root = "/dev/${cfg.poolName}/root";
+      swap = "/dev/${cfg.volumeGroup}/swap";
+      root = "/dev/${cfg.volumeGroup}/root";
     }
     else {
       boot = dev 1;
@@ -54,22 +54,22 @@
     root_dev=${devices.root}
   '';
 
+  btrfsOptions = "compress-force=zstd:22,noatime";
+
   mountDevs = ''
     echo "Mount the file systems..." >&2
 
     mkdir -p /mnt
-    mount -t zfs ${cfg.poolName}/system/nixos /mnt
+    mount -t btrfs -o subvol=system/nixos,${btrfsOptions} "$root_dev" /mnt
 
     mkdir -p /mnt/boot
     mount "$boot_dev" /mnt/boot
 
-    # TODO: Detect if it is safe to do so.
-    # (( $(swapon --show=type --noheadings | wc -l) > 0 ))
-    # swapon "$swap_dev"
+    (( $(swapon --show=type --noheadings | wc -l) > 0 )) && swapon "$swap_dev"
 
     mkdir -p /mnt/{home,nix}
-    mount -t zfs ${cfg.poolName}/user/home /mnt/home
-    mount -t zfs ${cfg.poolName}/cache/nix /mnt/nix
+    mount -t btrfs -o subvol=user/home,${btrfsOptions} "$root_dev" /mnt/home
+    mount -t btrfs -o subvol=cache/nix,${btrfsOptions} "$root_dev" /mnt/nix
   '';
 in {
   options.setup = let
@@ -101,9 +101,9 @@ in {
       default = 1024;
     };
 
-    poolName = mkOption {
+    volumeGroup = mkOption {
       type = str;
-      default = "zroot";
+      default = "lvm";
     };
 
     script = mkOption {
@@ -135,32 +135,6 @@ in {
           else {
             grub = { inherit (cfg) device; };
           };
-
-        fileSystems = {
-          "/" = {
-            device = "${cfg.poolName}/system/nixos";
-            fsType = "zfs";
-          };
-          "/boot" = {
-            device = dev 1;
-            fsType =
-              if cfg.firmware == "uefi"
-              then "vfat"
-              else "ext2";
-          };
-          "/home" = {
-            device = "${cfg.poolName}/user/home";
-            fsType = "zfs";
-          };
-          "/nix" = {
-            device = "${cfg.poolName}/cache/nix";
-            fsType = "zfs";
-          };
-        };
-
-        swapDevices = singleton {
-          device = devices.swap;
-        };
       })
       {
         boot.initrd.luks.devices.root = mkIf cfg.enableEncryption {
@@ -169,7 +143,7 @@ in {
           preLVM = true;
         };
 
-        boot.supportedFilesystems = [ "zfs" ];
+        boot.supportedFilesystems = [ "btrfs" ];
 
         setup.script = mkMerge [
           (let
@@ -246,9 +220,9 @@ in {
 
                   echo "Initalize LVM within the encrypted partition..." >&2
                   pvcreate /dev/mapper/root
-                  vgcreate ${cfg.poolName} /dev/mapper/root
-                  lvcreate --size ${toString cfg.swapSize} --name swap ${cfg.poolName}
-                  lvcreate --extents 100%FREE --name root ${cfg.poolName}
+                  vgcreate ${cfg.volumeGroup} /dev/mapper/root
+                  lvcreate --size ${toString cfg.swapSize} --name swap ${cfg.volumeGroup}
+                  lvcreate --extents 100%FREE --name root ${cfg.volumeGroup}
                 ''
                 else
                   sfdisk [
@@ -277,26 +251,27 @@ in {
               echo "Format the swap partition..." >&2
               mkswap -f "$swap_dev" -L swap
 
-              echo "Format the root partition as ZFS..." >&2
-              zpool create -f \
-                -O atime=on -O relatime=on \
-                -O xattr=sa \
-                -O acltype=posixacl \
-                -O compression=lz4 \
-                -O normalization=formD \
-                -o ashift=12 \
-                -o altroot=/mnt \
-                ${cfg.poolName} "$root_dev"
+              (
+                echo "Format the root partition as btrfs..." >&2
+                mkfs.btrfs -L root "$root_dev"
 
-              # For files that can be reproduced, but are stored for performance.
-              zfs create -o mountpoint=none ${cfg.poolName}/cache
-              zfs create -o mountpoint=legacy -o atime=off -o relatime=off ${cfg.poolName}/cache/nix
+                mkdir -p /mnt
+                mount -t btrfs -o ${btrfsOptions} "$root_dev" /mnt
+                cd /mnt
 
-              zfs create -o mountpoint=none ${cfg.poolName}/system
-              zfs create -o mountpoint=legacy ${cfg.poolName}/system/nixos
+                # For files that can be reproduced, but are stored for performance.
+                btrfs subvolume create cache
+                btrfs subvolume create cache/nix
+                btrfs subvolume create cache/nix/store
 
-              zfs create -o mountpoint=none ${cfg.poolName}/user
-              zfs create -o mountpoint=legacy ${cfg.poolName}/user/home
+                btrfs subvolume create system
+                btrfs subvolume create system/nixos
+
+                btrfs subvolume create user
+                btrfs subvolume create user/home
+
+                umount /mnt
+              )
 
               ${mountDevs}
 

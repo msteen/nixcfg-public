@@ -15,12 +15,12 @@
 
     extra-container = {
       url = "github:erikarvstedt/extra-container";
-      inputs.nixpkgs.follows = "nixos-stable";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     home-manager = {
       url = "github:nix-community/home-manager/release-22.11";
-      inputs.nixpkgs.follows = "nixos-stable";
+      inputs.nixpkgs.follows = "nixos-22_11";
       inputs.utils.follows = "extra-container/flake-utils";
     };
 
@@ -29,12 +29,17 @@
       inputs.nixpkgs.follows = "nixos-unstable";
       inputs.nixpkgs-stable.follows = "nixos-stable";
     };
+
+    nixos-vscode-server = {
+      url = "github:msteen/nixos-vscode-server";
+      inputs.nixpkgs.follows = "nixos-stable";
+      inputs.flake-utils.follows = "extra-container/flake-utils";
+    };
   };
 
   outputs = inputs:
-    inputs.nixcfg.lib.mkNixcfg {
+    inputs.nixcfg.lib.mkNixcfgFlake {
       name = "public";
-      path = ./.;
       inherit inputs;
     };
 }

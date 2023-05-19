@@ -1,8 +1,9 @@
+# Without destructering the required module arguments, they will not be provided due to being a lazy attrset.
 {
   lib,
   pkgs,
-  inputs,
-  nixcfgs,
+  sources,
+  data,
   ...
 } @ args:
-nixcfgs.public.data.sops args (packages: { environment.systemPackages = packages; })
+data.public.sops args (packages: { environment.systemPackages = packages; })

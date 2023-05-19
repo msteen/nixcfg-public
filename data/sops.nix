@@ -1,19 +1,11 @@
 {
   lib,
   pkgs,
-  inputs,
+  sources,
   ...
-}: f: let
-  inherit (builtins)
-    attrValues
-    ;
-  inherit (lib)
-    mkIf
-    mkMerge
-    ;
-in {
-  config = mkIf (inputs ? sops-nix) (mkMerge [
-    (f (attrValues { inherit (pkgs) sops ssh-to-age ssh-to-pgp; }))
+}: f: {
+  config = lib.mkIf (sources ? sops-nix) (lib.mkMerge [
+    (f (lib.attrValues { inherit (pkgs) sops ssh-to-age ssh-to-pgp; }))
     {
       sops = {
         # FIXME: We probably want a systemd service that automatically generates the age key file based on our ssh key.
