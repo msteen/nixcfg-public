@@ -3,8 +3,8 @@
 
   inputs = {
     nixos-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixos-stable.follows = "nixos-22_11";
-    nixos-22_11.url = "github:NixOS/nixpkgs/nixos-22.11";
+    nixos-stable.follows = "nixos-23_05";
+    nixos-23_05.url = "github:NixOS/nixpkgs/nixos-23.05";
 
     nixpkgs.follows = "nixos-stable";
 
@@ -19,9 +19,8 @@
     };
 
     home-manager = {
-      url = "github:nix-community/home-manager/release-22.11";
-      inputs.nixpkgs.follows = "nixos-22_11";
-      inputs.utils.follows = "extra-container/flake-utils";
+      url = "github:nix-community/home-manager/release-23.05";
+      inputs.nixpkgs.follows = "nixos-23_05";
     };
 
     sops-nix = {
@@ -34,6 +33,11 @@
       url = "github:msteen/nixos-vscode-server";
       inputs.nixpkgs.follows = "nixos-stable";
       inputs.flake-utils.follows = "extra-container/flake-utils";
+    };
+
+    nix-index-database = {
+      url = "github:Mic92/nix-index-database";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 

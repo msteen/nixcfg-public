@@ -1,5 +1,7 @@
-final: prev:
-with final; {
+{
+  self,
+  lib,
+}: {
   applyIf = b: f: x:
     if b
     then f x
@@ -29,8 +31,8 @@ with final; {
     fi
   '';
 
-  unlines = lines: builtins.splitString "\n" (builtins.removeSuffix "\n" lines);
-  lines = lines: builtins.concatMapStrings (line: line + "\n") lines;
-  lines' = lines: builtins.concatStringsSep "\n" lines;
+  unlines = lines: lib.splitString "\n" (lib.removeSuffix "\n" lines);
+  lines = lines: lib.concatMapStrings (line: line + "\n") lines;
+  lines' = lines: lib.concatStringsSep "\n" lines;
   nonl = text: lib.removeSuffix "\n" text;
 }
