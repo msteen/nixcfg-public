@@ -3,8 +3,8 @@
 
   inputs = {
     nixos-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixos-stable.follows = "nixos-23_05";
-    nixos-23_05.url = "github:NixOS/nixpkgs/nixos-23.05";
+    nixos-stable.follows = "nixos-23_11";
+    nixos-23_11.url = "github:NixOS/nixpkgs/nixos-23.11";
 
     nixpkgs.follows = "nixos-stable";
 
@@ -19,8 +19,8 @@
     };
 
     home-manager = {
-      url = "github:nix-community/home-manager/release-23.05";
-      inputs.nixpkgs.follows = "nixos-23_05";
+      url = "github:nix-community/home-manager/release-23.11";
+      inputs.nixpkgs.follows = "nixos-23_11";
     };
 
     sops-nix = {
