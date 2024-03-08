@@ -1,5 +1,6 @@
 {
   lib,
+  pkgs,
   config,
   nixcfg,
   ...
@@ -96,6 +97,9 @@ in {
       nix.settings.trusted-users = cfg.admins;
     })
     {
+      users.defaultUserShell = pkgs.zsh;
+      programs.zsh.enable = true;
+      
       users.groups = listToAttrs (map ({
         id,
         name,

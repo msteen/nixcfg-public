@@ -1,7 +1,6 @@
 {
   lib,
   pkgs,
-  data,
   profiles,
   ...
 }: {
@@ -11,11 +10,9 @@
     }
     ++ [ lib.dummyNixosModule ];
 
-  environment.systemPackages =
-    data.public.standard-pkgs { inherit pkgs; }
-    ++ lib.attrValues {
-      inherit (pkgs) nix-tree;
-    };
+  environment.systemPackages = lib.attrValues {
+    inherit (pkgs) nix-tree git;
+  };
 
   environment.shellAliases = {
     # If the last character of the alias value is a space or tab character,
