@@ -5,7 +5,7 @@ let
 
 in {
   config = {
-    environment.systemPackages = with pkgs; [ php ];
+    environment.systemPackages = lib.attrValues { inherit (pkgs) php; };
 
     services.phpfpm = {
       pools.www = {

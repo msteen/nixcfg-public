@@ -11,9 +11,5 @@
     "xts"
   ];
 
-  environment.systemPackages = with pkgs; [
-    mklinuxpba
-    sedutil
-    sedutil-scripts
-  ];
+  environment.systemPackages = lib.attrValues { inherit (pkgs) mklinuxpba sedutil sedutil-scripts; };
 }

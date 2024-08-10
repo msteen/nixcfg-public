@@ -11,7 +11,7 @@
     '';
   };
 
-  environment.systemPackages = with pkgs; [ mongodb-tools ];
+  environment.systemPackages = lib.attrValues { inherit (pkgs) mongodb-tools; };
 
   services.mongodb.enable = true;
 }

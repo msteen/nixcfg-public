@@ -62,7 +62,7 @@ in {
     '';
 
     system.activationScripts.kexec-boot = lib.stringAfter [ "export-system-config" ] "${pkgs.writeBash "kexec-boot.sh" ''
-      PATH=${makeBinPath (with pkgs; [ coreutils gnused ])}
+      PATH=${makeBinPath (lib.attrValues { inherit (pkgs) coreutils gnused; })}
 
       if [[ -d /boot/kexec ]]; then
         rm -rf /boot/kexec

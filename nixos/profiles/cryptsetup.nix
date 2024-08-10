@@ -29,7 +29,7 @@
     '';
   };
 
-  environment.systemPackages = with pkgs; [ cryptsetup ];
+  environment.systemPackages = lib.attrValues { inherit (pkgs) cryptsetup; };
 
   environment.sudoAliases = [ "cryptsetup" ];
 }
