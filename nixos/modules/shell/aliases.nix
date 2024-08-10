@@ -1,12 +1,13 @@
 { config, lib, ... }:
 
 let
+  inherit (lib) types;
   cfg = config.environment;
 
 in {
-  options.environment.sudoAliases = with types; lib.mkOption {
+  options.environment.sudoAliases = lib.mkOption {
     default = [];
-    type = lib.listOf str;
+    type = types.listOf types.str;
     description = ''
       A list of executables that should always be prepended with sudo.
     '';

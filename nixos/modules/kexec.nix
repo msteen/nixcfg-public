@@ -3,9 +3,9 @@
 let
   boot = if config.fileSystems ? "/boot" then config.fileSystems."/boot" else config.fileSystems."/";
   bootPathSuffix = if config.fileSystems ? "/boot" then "" else "/boot";
-  bootTy = lib.boot.fsType;
-  bootOpts = lib.concatStringsSep "," lib.boot.options;
-  bootDev = if lib.boot.device != null then lib.boot.device else "/dev/disk/by-label/${boot.label}";
+  bootTy = boot.fsType;
+  bootOpts = lib.concatStringsSep "," boot.options;
+  bootDev = if boot.device != null then boot.device else "/dev/disk/by-label/${boot.label}";
   kexec-boot = pkgs.writeShBin "kexec-boot" ''
     if [ -d /boot ]; then
       boot=/boot
@@ -51,9 +51,9 @@ in {
       }
     ];
 
-    boot.initrd.supportedFilesystems = [ lib.bootTy ];
+    boot.initrd.supportedFilesystems = [ bootTy ];
 
-    nixpkgs.overlays = lib.singleton (self: super: {
+    nixpkgs.overlays = lib.singleton (final: prev: {
       inherit kexec-boot;
     });
 

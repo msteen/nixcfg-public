@@ -1,13 +1,14 @@
 { config, lib, pkgs, ... }:
 
 let
+  inherit (lib) types;
   cfg = config.boot.initrd.udev;
 
 in {
   options = {
-    boot.initrd.udev = with types; {
+    boot.initrd.udev = {
       extraRules = lib.mkOption {
-        type = lines;
+        type = types.lines;
         default = "";
         description = ''
           Extra udev rules for in the initial ramdisk.

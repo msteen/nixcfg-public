@@ -1,12 +1,13 @@
 { config, lib, ... }:
 
 let
+  inherit (lib) types;
   cfg = config.services.syncthing;
 
 in {
-  options.services.syncthing = with types; {
+  options.services.syncthing ={
     domain = lib.mkOption {
-      type = lib.nullOr str;
+      type = types.nullOr types.str;
       default = null;
       description = ''
         The forward proxy domain to access the GUI address.

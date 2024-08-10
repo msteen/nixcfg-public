@@ -1,6 +1,7 @@
 { config, lib, pkgs, ... }:
 
 let
+  inherit (lib) types;
   cfg = config.services.samba-addc;
 
   sambaToString = x: if builtins.typeOf x == "bool" then if x then "yes" else "no" else lib.toString x;
@@ -23,11 +24,11 @@ let
   '';
 
 in {
-  options.services.samba-addc = with types; {
+  options.services.samba-addc = {
     enable = lib.mkEnableOption "Samba server";
 
     package = lib.mkOption {
-      type = package;
+      type = types.package;
       default = pkgs.samba-addc;
       defaultText = "pkgs.samba-addc";
       description = ''
@@ -36,7 +37,7 @@ in {
     };
 
     configFile = lib.mkOption {
-      type = lib.nullOr path;
+      type = types.nullOr types.path;
       default = null;
       description = ''
         The Samba server config file <literal>smb.conf</literal>.
@@ -46,7 +47,7 @@ in {
     };
 
     extraConfig = lib.mkOption {
-      type = lines;
+      type = types.lines;
       default = "";
       description = ''
         Additional global section and extra section lines go in here.
@@ -57,8 +58,8 @@ in {
       '';
     };
 
-    shares = mkOption {
-      type = lib.attrsOf (lib.attrsOf unspecified);
+    shares = lib.mkOption {
+      type = types.attrsOf (types.attrsOf types.unspecified);
       default = {};
       description = ''
         A set describing shared resources. See <command>man smb.conf</command> for options.

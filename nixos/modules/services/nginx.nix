@@ -1,15 +1,16 @@
 { config, pkgs, ... }:
 
 let
+  inherit (lib) types;
   cfg = config.services.nginx;
   user = config.users.users.www-data.name;
   group = config.users.groups.www-data.name;
 
 in {
-  options = with types; {
+  options = {
     services.nginx = {
       openPorts = lib.mkOption {
-        type = bool;
+        type = typesbool;
         default = true;
         description = ''
           Open the default ports used by Nginx for HTTP (80) and HTTPS (443) in the firewall.
@@ -17,7 +18,7 @@ in {
       };
 
       http = lib.mkOption {
-        type = lib.attrsOf lines;
+        type = types.attrsOf types.lines;
         default = {};
         description = ''
           The server config for HTTP domains.
@@ -25,7 +26,7 @@ in {
       };
 
       https = lib.mkOption {
-        type = lib.attrsOf lines;
+        type = types.attrsOf types.lines;
         default = {};
         description = ''
           The server config for HTTPS domains.

@@ -5,7 +5,7 @@ final: prev: {
   boot-deps = config:
     final.callPackage ../pkgs/boot-deps {
       inherit config;
-      pkgs = self;
+      pkgs = final;
     };
   lnover = final.callPackage ./lnover { };
   mklinuxpba = final.callPackage ./mklinuxpba { };

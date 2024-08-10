@@ -1,6 +1,8 @@
 { config, lib, pkgs, ... }:
 
 let
+  inherit (lib) types;
+
   cfg = config.boot.initrd.linuxpba;
 
   # https://github.com/gebart/opal-kexec-pba
@@ -18,11 +20,11 @@ in {
     ../../config/sedutil.nix
   ];
 
-  options.boot.initrd.linuxpba = with types; {
+  options.boot.initrd.linuxpba = {
     enable = lib.mkEnableOption "unlocking a disk with sedutil inside of the initial ramdisk";
 
     disk = lib.mkOption {
-      type = path;
+      type = types.path;
       example = "/dev/sda";
       description = ''
         The disk to unlock with sedutil.

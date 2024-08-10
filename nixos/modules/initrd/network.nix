@@ -1,12 +1,13 @@
 { config, lib, pkgs, ... }:
 
 let
+  inherit (lib) types;
   cfg = config.networking;
   inherit (config.boot.initrd.network) enable interface;
 
 in {
-  options.boot.initrd.network.interface = with types; lib.mkOption {
-    type = str;
+  options.boot.initrd.network.interface = lib.mkOption {
+    type = types.str;
     default = "eth0";
     description = ''
       The ethernet interface to use within the initial ramdisk.
@@ -15,8 +16,8 @@ in {
 
   config = lib.mkIf ((!cfg.useDHCP || cfg.interfaces ? ${interface} && !(let value = cfg.interfaces.${interface}.useDHCP; in value != null && value)) && !cfg.networkmanager.enable) (lib.mkMerge [
     {
-      assertions = singleton {
-        assertion = !enable || cfg.defaultGateway != null && cfg.interfaces ? ${interface} && length cfg.interfaces.${interface}.ipv4.addresses > 0;
+      assertions = lib.singleton {
+        assertion = !enable || cfg.defaultGateway != null && cfg.interfaces ? ${interface} && lib.length cfg.interfaces.${interface}.ipv4.addresses > 0;
         message = ''
           To support a static IP address within the initial ramdisk the following things are required:
             1. A default IPv4 gateway
@@ -25,7 +26,7 @@ in {
         '';
       };
     }
-    (lib.mkIf enable (with cfg; with (head cfg.interfaces.${interface}.ipv4.addresses);
+    (lib.mkIf enable (with cfg; with (lib.head cfg.interfaces.${interface}.ipv4.addresses);
     let
       netmask = lib.import (pkgs.runCommand "netmask.nix" { } ''
         eval $(${pkgs.busybox}/bin/ipcalc --netmask 127.0.0.1/${toString prefixLength})

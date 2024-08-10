@@ -1,6 +1,7 @@
 { config, lib, ... }:
 
 let
+  inherit (lib) types;
   cfg = config.environment;
 
   guardedAnyShellInit = ''
@@ -17,8 +18,8 @@ let
   '';
 
 in {
-  options.environment.anyShellInit = with types; lib.mkOption {
-    type = lines;
+  options.environment.anyShellInit = lib.mkOption {
+    type = types.lines;
     description = ''
       Shell script code called during any shell initialization.
     '';

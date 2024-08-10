@@ -1,6 +1,7 @@
 { config, lib, pkgs, ... }:
 
 let
+  inherit (lib) types;
   cfg = config.boot.initrd.network.ssh;
 
   sshdConfig = pkgs.writeText "sshd_config" ''
@@ -22,19 +23,19 @@ let
 in {
   disabledModules = [ "system/boot/initrd-ssh.nix" ];
 
-  options.boot.initrd.network.ssh = with types; {
+  options.boot.initrd.network.ssh = {
     enable = lib.mkEnableOption "SSHD inside of the initial ramdisk";
 
     port = lib.mkOption {
-      type = int;
-      default = head config.services.openssh.ports;
+      type = types.int;
+      default = lib.head config.services.openssh.ports;
       description = ''
         The port to which SSHD inside of the initial ramdisk will listen to.
       '';
     };
 
     hostKeys = lib.mkOption {
-      type = lib.attrsOf path;
+      type = types.attrsOf types.path;
       example = { "ssh_host_ed25519_key" = "/etc/ssh/ssh_host_ed25519_key"; };
       description = ''
         List of host keys for SSHD inside of the initial ramdisk.
@@ -42,7 +43,7 @@ in {
     };
 
     shell = lib.mkOption {
-      type = str;
+      type = types.str;
       default = "/bin/ash";
       description = ''
         The login shell for the root user inside of the initial ramdisk.
@@ -50,7 +51,7 @@ in {
     };
 
     shellInit = lib.mkOption {
-      type = lines;
+      type = types.lines;
       default = "";
       description = ''
         The login shell initialization for the root user inside of the initial ramdisk.
@@ -58,14 +59,14 @@ in {
     };
 
     authorizedKeys = lib.mkOption {
-      type = listOf str;
+      type = types.listOf types.str;
       description = ''
         List of authorized keys for the root user inside of the initial ramdisk.
       '';
     };
 
     extraConfig = lib.mkOption {
-      type = lines;
+      type = types.lines;
       default = "";
       description = ''
         Verbatim contents of <filename>sshd_config</filename> inside of the initial ramdisk.
@@ -73,7 +74,7 @@ in {
     };
 
     moduliFile = lib.mkOption {
-      type = path;
+      type = types.path;
       description = ''
         Path to <literal>moduli</literal> file to install in <filename>/etc/ssh/moduli</filename> inside of the initial ramdisk.
         If this option is unset, then the <literal>moduli</literal> file shipped with OpenSSH will be used.
@@ -132,7 +133,7 @@ in {
         ssh.moduliFile = lib.mkDefault "${pkgs.openssh}/etc/ssh/moduli";
       };
 
-      secrets = lib.mapAttrs' (name: value: nameValuePair ("/etc/ssh/" + name) value) cfg.hostKeys;
+      secrets = lib.mapAttrs' (name: value: lib.nameValuePair ("/etc/ssh/" + name) value) cfg.hostKeys;
     };
 
     networking.usePredictableInterfaceNames = false;
