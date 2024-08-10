@@ -1,7 +1,5 @@
 { config, lib, pkgs, ... }:
 
-with lib;
-
 let
   cfg = config.services.phpfpm;
 
@@ -32,7 +30,7 @@ in {
         };
       };
 
-      phpOptions = optionalString (config.services.dehydrated.domains == {}) ''
+      phpOptions = lib.optionalString (config.services.dehydrated.domains == {}) ''
         error_reporting = E_ALL
         display_errors = On
         display_startup_errors = On

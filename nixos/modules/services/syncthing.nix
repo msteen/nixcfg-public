@@ -20,9 +20,9 @@ in {
       allow 192.168.0.0/24;
       deny all;
       location / {
-        ${proxyWithoutHost "http://${cfg.guiAddress}"}
+        ${lib.proxyWithoutHost "http://${cfg.guiAddress}"}
         proxy_set_header Host localhost;
-        ${noIndex}
+        ${lib.noIndex}
       }
     '';
   };

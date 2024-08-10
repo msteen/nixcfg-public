@@ -1,7 +1,5 @@
 { config, lib, pkgs, ... }:
 
-with lib;
-
 {
   boot.kernelParams = [ "libata.allow_tpm=1" ];
 

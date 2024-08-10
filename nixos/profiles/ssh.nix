@@ -1,10 +1,8 @@
-{ config, pkgs, ... }:
-
-with import ../lib;
+{ lib, config, pkgs, ... }:
 
 let
   ciphersAndMACs = ''
-    Ciphers ${commaLines ''
+    Ciphers ${lib.commaLines ''
       chacha20-poly1305@openssh.com
       aes256-gcm@openssh.com
       aes128-gcm@openssh.com
@@ -12,7 +10,7 @@ let
       aes192-ctr
       aes128-ctr
     ''}
-    MACs ${commaLines ''
+    MACs ${lib.commaLines ''
       hmac-sha2-512-etm@openssh.com
       hmac-sha2-256-etm@openssh.com
       umac-128-etm@openssh.com
@@ -43,11 +41,11 @@ in {
         PasswordAuthentication no
 
         PubkeyAuthentication yes
-        KexAlgorithms ${commaLines ''
+        KexAlgorithms ${lib.commaLines ''
           curve25519-sha256@libssh.org
           diffie-hellman-group-exchange-sha256
         ''}
-        HostKeyAlgorithms ${commaLines ''
+        HostKeyAlgorithms ${lib.commaLines ''
           ssh-ed25519-cert-v01@openssh.com
           ssh-rsa-cert-v01@openssh.com
           ssh-ed25519
