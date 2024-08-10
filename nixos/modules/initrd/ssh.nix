@@ -1,7 +1,5 @@
 { config, lib, pkgs, ... }:
 
-with lib;
-
 let
   cfg = config.boot.initrd.network.ssh;
 
@@ -25,9 +23,9 @@ in {
   disabledModules = [ "system/boot/initrd-ssh.nix" ];
 
   options.boot.initrd.network.ssh = with types; {
-    enable = mkEnableOption "SSHD inside of the initial ramdisk";
+    enable = lib.mkEnableOption "SSHD inside of the initial ramdisk";
 
-    port = mkOption {
+    port = lib.mkOption {
       type = int;
       default = head config.services.openssh.ports;
       description = ''
@@ -35,15 +33,15 @@ in {
       '';
     };
 
-    hostKeys = mkOption {
-      type = attrsOf path;
+    hostKeys = lib.mkOption {
+      type = lib.attrsOf path;
       example = { "ssh_host_ed25519_key" = "/etc/ssh/ssh_host_ed25519_key"; };
       description = ''
         List of host keys for SSHD inside of the initial ramdisk.
       '';
     };
 
-    shell = mkOption {
+    shell = lib.mkOption {
       type = str;
       default = "/bin/ash";
       description = ''
@@ -51,7 +49,7 @@ in {
       '';
     };
 
-    shellInit = mkOption {
+    shellInit = lib.mkOption {
       type = lines;
       default = "";
       description = ''
@@ -59,14 +57,14 @@ in {
       '';
     };
 
-    authorizedKeys = mkOption {
+    authorizedKeys = lib.mkOption {
       type = listOf str;
       description = ''
         List of authorized keys for the root user inside of the initial ramdisk.
       '';
     };
 
-    extraConfig = mkOption {
+    extraConfig = lib.mkOption {
       type = lines;
       default = "";
       description = ''
@@ -74,7 +72,7 @@ in {
       '';
     };
 
-    moduliFile = mkOption {
+    moduliFile = lib.mkOption {
       type = path;
       description = ''
         Path to <literal>moduli</literal> file to install in <filename>/etc/ssh/moduli</filename> inside of the initial ramdisk.
@@ -83,7 +81,7 @@ in {
     };
   };
 
-  config = mkIf cfg.enable {
+  config = lib.mkIf cfg.enable {
     boot.initrd = {
       extraUtilsCommands = ''
         copy_bin_and_libs ${pkgs.openssh}/bin/sshd
@@ -131,10 +129,10 @@ in {
           /bin/sshd -f ${sshdConfig}
         '';
 
-        ssh.moduliFile = mkDefault "${pkgs.openssh}/etc/ssh/moduli";
+        ssh.moduliFile = lib.mkDefault "${pkgs.openssh}/etc/ssh/moduli";
       };
 
-      secrets = mapAttrs' (name: value: nameValuePair ("/etc/ssh/" + name) value) cfg.hostKeys;
+      secrets = lib.mapAttrs' (name: value: nameValuePair ("/etc/ssh/" + name) value) cfg.hostKeys;
     };
 
     networking.usePredictableInterfaceNames = false;

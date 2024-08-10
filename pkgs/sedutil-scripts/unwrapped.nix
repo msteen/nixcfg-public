@@ -1,7 +1,5 @@
 { lib, writeShBin, ensureRoot, buildEnv }:
 
-with lib;
-
 # https://github.com/Drive-Trust-Alliance/sedutil/wiki/Encrypting-your-disk
 let
   writeSedutilScript = name: args: text:

@@ -1,7 +1,5 @@
 { config, lib, pkgs, ... }:
 
-with lib;
-
 let
   cfg = config.boot.initrd.linuxpba;
 
@@ -21,9 +19,9 @@ in {
   ];
 
   options.boot.initrd.linuxpba = with types; {
-    enable = mkEnableOption "unlocking a disk with sedutil inside of the initial ramdisk";
+    enable = lib.mkEnableOption "unlocking a disk with sedutil inside of the initial ramdisk";
 
-    disk = mkOption {
+    disk = lib.mkOption {
       type = path;
       example = "/dev/sda";
       description = ''
@@ -32,7 +30,7 @@ in {
     };
   };
 
-  config = mkIf cfg.enable {
+  config = lib.mkIf cfg.enable {
     boot.initrd = {
       extraUtilsCommands = ''
         copy_bin_and_libs ${pkgs.sedutil}/bin/getpasswd

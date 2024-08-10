@@ -1,11 +1,9 @@
 { config, lib, ... }:
 
-with lib;
-
 {
   options = with types; {
     services.phpfpm = {
-      user = mkOption {
+      user = lib.mkOption {
         type = str;
         default = config.users.users.www-data.name;
         description = ''
@@ -13,7 +11,7 @@ with lib;
         '';
       };
 
-      group = mkOption {
+      group = lib.mkOption {
         type = str;
         default = config.users.groups.www-data.name;
         description = ''

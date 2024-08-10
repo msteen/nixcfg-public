@@ -3,8 +3,6 @@
 , initialRamdisk ? config.system.build.initialRamdisk
 }:
 
-with pkgs.lib;
-
 pkgs.runCommand "boot-deps" { buildInputs = [ pkgs.nukeReferences ]; } ''
   mkdir $out
 

@@ -1,13 +1,11 @@
 { config, lib, pkgs, ... }:
 
-with lib;
-
 let
   boot = if config.fileSystems ? "/boot" then config.fileSystems."/boot" else config.fileSystems."/";
   bootPathSuffix = if config.fileSystems ? "/boot" then "" else "/boot";
-  bootTy = boot.fsType;
-  bootOpts = concatStringsSep "," boot.options;
-  bootDev = if boot.device != null then boot.device else "/dev/disk/by-label/${boot.label}";
+  bootTy = lib.boot.fsType;
+  bootOpts = lib.concatStringsSep "," lib.boot.options;
+  bootDev = if lib.boot.device != null then lib.boot.device else "/dev/disk/by-label/${boot.label}";
   kexec-boot = pkgs.writeShBin "kexec-boot" ''
     if [ -d /boot ]; then
       boot=/boot
@@ -41,7 +39,7 @@ let
   '';
 
 in {
-  config = mkIf (config.boot.loader.grub.enable && config.fileSystems ? "/") {
+  config = lib.mkIf (config.boot.loader.grub.enable && config.fileSystems ? "/") {
     assertions = [
       {
         assertion = config.boot.loader.grub.enable;
@@ -53,9 +51,9 @@ in {
       }
     ];
 
-    boot.initrd.supportedFilesystems = [ bootTy ];
+    boot.initrd.supportedFilesystems = [ lib.bootTy ];
 
-    nixpkgs.overlays = singleton (self: super: {
+    nixpkgs.overlays = lib.singleton (self: super: {
       inherit kexec-boot;
     });
 
@@ -63,7 +61,7 @@ in {
       export systemConfig
     '';
 
-    system.activationScripts.kexec-boot = stringAfter [ "export-system-config" ] "${pkgs.writeBash "kexec-boot.sh" ''
+    system.activationScripts.kexec-boot = lib.stringAfter [ "export-system-config" ] "${pkgs.writeBash "kexec-boot.sh" ''
       PATH=${makeBinPath (with pkgs; [ coreutils gnused ])}
 
       if [[ -d /boot/kexec ]]; then

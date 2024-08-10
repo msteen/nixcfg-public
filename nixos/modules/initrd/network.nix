@@ -1,13 +1,11 @@
 { config, lib, pkgs, ... }:
 
-with lib;
-
 let
   cfg = config.networking;
   inherit (config.boot.initrd.network) enable interface;
 
 in {
-  options.boot.initrd.network.interface = with types; mkOption {
+  options.boot.initrd.network.interface = with types; lib.mkOption {
     type = str;
     default = "eth0";
     description = ''
@@ -15,7 +13,7 @@ in {
     '';
   };
 
-  config = mkIf ((!cfg.useDHCP || cfg.interfaces ? ${interface} && !(let value = cfg.interfaces.${interface}.useDHCP; in value != null && value)) && !cfg.networkmanager.enable) (mkMerge [
+  config = lib.mkIf ((!cfg.useDHCP || cfg.interfaces ? ${interface} && !(let value = cfg.interfaces.${interface}.useDHCP; in value != null && value)) && !cfg.networkmanager.enable) (lib.mkMerge [
     {
       assertions = singleton {
         assertion = !enable || cfg.defaultGateway != null && cfg.interfaces ? ${interface} && length cfg.interfaces.${interface}.ipv4.addresses > 0;
@@ -27,9 +25,9 @@ in {
         '';
       };
     }
-    (mkIf enable (with cfg; with (head cfg.interfaces.${interface}.ipv4.addresses);
+    (lib.mkIf enable (with cfg; with (head cfg.interfaces.${interface}.ipv4.addresses);
     let
-      netmask = import (pkgs.runCommand "netmask.nix" { } ''
+      netmask = lib.import (pkgs.runCommand "netmask.nix" { } ''
         eval $(${pkgs.busybox}/bin/ipcalc --netmask 127.0.0.1/${toString prefixLength})
         echo '"'"$NETMASK"'"' > "$out"
       '').outPath;

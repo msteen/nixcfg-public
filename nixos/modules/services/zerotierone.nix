@@ -1,9 +1,7 @@
 { config, lib, ... }:
 
-with lib;
-
 {
-  config = mkIf config.services.zerotierone.enable {
-    environment.sudoAliases = map (name: "zerotier-${name}") [ "cli" "idtool" "one" ];
+  config = lib.mkIf config.services.zerotierone.enable {
+    environment.sudoAliases = lib.map (name: "zerotier-${name}") [ "cli" "idtool" "one" ];
   };
 }

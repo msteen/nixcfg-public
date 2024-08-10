@@ -1,8 +1,6 @@
 { lib, writeBashBin, setFailFast, ensureRoot, exportNixosConfig
 , coreutils, utillinux, bash, gptfdisk, syslinux, dosfstools, nix, gnutar, gzip, git }:
 
-with lib;
-
 # https://wiki.archlinux.org/index.php/syslinux
 # https://aur.archlinux.org/cgit/aur.git/tree/mklinuxpba-diskimg?h=sedutil
 writeBashBin "mklinuxpba" ''

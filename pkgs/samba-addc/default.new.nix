@@ -63,8 +63,6 @@
 , enableRegedit ? true
 }:
 
-with lib;
-
 let
   python3Packages = pkgs: with pkgs; [
     dnspython
@@ -77,7 +75,7 @@ in stdenv.mkDerivation rec {
   pname = "samba";
   version = "4.11.7";
 
-  src = fetchurl {
+  src = lib.fetchurl {
     url = "mirror://samba/pub/samba/stable/${pname}-${version}.tar.gz";
     sha256 = "0hr1qjn249lfiazbrr0ya7sgkpn6dp9dbqjka643ydspqgmzkdkr";
   };
@@ -89,7 +87,7 @@ in stdenv.mkDerivation rec {
     ./4.x-no-persistent-install-dynconfig.patch
     ./4.x-no-persistent-install.patch
     ./patch-source3__libads__kerberos_keytab.c.patch
-    (fetchpatch {
+    (lib.fetchpatch {
       name = "test-oLschema2ldif-fmemopen.patch";
       url = "https://gitlab.com/samba-team/samba/commit/5e517e57c9d4d35e1042a49d3592652b05f0c45b.patch";
       sha256 = "1bbldf794svsdvcbp649imghmj0jck7545d3k9xs953qkkgwkbxi";
@@ -146,12 +144,12 @@ in stdenv.mkDerivation rec {
     xfsprogs
     zlib
   ]
-  ++ optional enableCephFS libceph
-  ++ optionals enableGlusterFS [ glusterfs libuuid ]
-  ++ optional enableLDAP openldap
-  ++ optional enableMDNS avahi
-  ++ optional enablePrinting cups
-  ++ optional enableRegedit ncurses;
+  ++ lib.optional enableCephFS libceph
+  ++ lib.optionals enableGlusterFS [ glusterfs libuuid ]
+  ++ lib.optional enableLDAP openldap
+  ++ lib.optional enableMDNS avahi
+  ++ lib.optional enablePrinting cups
+  ++ lib.optional enableRegedit ncurses;
 
   postPatch = ''
     # Removes absolute paths in scripts.
@@ -171,7 +169,7 @@ in stdenv.mkDerivation rec {
     "--with-configdir=/etc/samba-addc"
     "--with-shared-modules=ALL"
     "--with-static-modules=NONE"
-  ] ++ optionals (!enableLDAP) [ "--without-ldap" "--without-ads" ];
+  ] ++ lib.optionals (!enableLDAP) [ "--without-ldap" "--without-ads" ];
 
   preBuild = ''
     export MAKEFLAGS="-j $NIX_BUILD_CORES"

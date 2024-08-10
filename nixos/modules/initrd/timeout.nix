@@ -1,12 +1,10 @@
 { config, lib, pkgs, ... }:
 
-with lib;
-
 let
   cfg = config.boot.initrd;
 
 in {
-  options.boot.initrd.timeout = with types; mkOption {
+  options.boot.initrd.timeout = with types; lib.mkOption {
     type = int;
     default = 0;
     description = ''
@@ -14,7 +12,7 @@ in {
     '';
   };
 
-  config = mkIf (cfg.timeout > 0) {
+  config = lib.mkIf (cfg.timeout > 0) {
     boot.initrd.network.postCommands = ''
     (
       echo 'timeout> timer started'

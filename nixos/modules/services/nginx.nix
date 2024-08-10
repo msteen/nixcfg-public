@@ -1,7 +1,5 @@
 { config, pkgs, ... }:
 
-with import ../../lib;
-
 let
   cfg = config.services.nginx;
   user = config.users.users.www-data.name;
@@ -10,7 +8,7 @@ let
 in {
   options = with types; {
     services.nginx = {
-      openPorts = mkOption {
+      openPorts = lib.mkOption {
         type = bool;
         default = true;
         description = ''
@@ -18,16 +16,16 @@ in {
         '';
       };
 
-      http = mkOption {
-        type = attrsOf lines;
+      http = lib.mkOption {
+        type = lib.attrsOf lines;
         default = {};
         description = ''
           The server config for HTTP domains.
         '';
       };
 
-      https = mkOption {
-        type = attrsOf lines;
+      https = lib.mkOption {
+        type = lib.attrsOf lines;
         default = {};
         description = ''
           The server config for HTTPS domains.
@@ -36,7 +34,7 @@ in {
     };
   };
 
-  config = mkIf cfg.enable (mkMerge [
+  config = lib.mkIf cfg.enable (lib.mkMerge [
     {
       environment.etc."nginx/fastcgi_params".source = "${pkgs.nginx}/conf/fastcgi_params";
 
@@ -47,12 +45,12 @@ in {
       users.groups.www-data = { };
 
       services.nginx = {
-        user = mkDefault "www-data";
-        group = mkDefault "www-data";
-        config = mkBefore ''
+        user = lib.mkDefault "www-data";
+        group = lib.mkDefault "www-data";
+        config = lib.mkBefore ''
           include /run/nginx-nixcfg/shared/nginx.conf;
         '';
-        httpConfig = mkBefore ''
+        httpConfig = lib.mkBefore ''
           include /run/nginx-nixcfg/shared/http.conf;
         '';
       };
@@ -67,9 +65,9 @@ in {
         { domain = user; type = "hard"; item = "nofile"; value  = "65536"; }
       ];
 
-      networking.firewall.allowedTCPPorts = mkIf cfg.openPorts [ 80 443 ];
+      networking.firewall.allowedTCPPorts = lib.mkIf cfg.openPorts [ 80 443 ];
 
-      system.activationScripts.nginx-nixcfg = stringAfter [ "users" "groups" ] ''
+      system.activationScripts.nginx-nixcfg = lib.stringAfter [ "users" "groups" ] ''
         mkdir -p /run/nginx-nixcfg
         ln -sfT ${config.path ../config/nginx} /run/nginx-nixcfg/shared
       '';
@@ -78,10 +76,10 @@ in {
       users.users.dehydrated = { name = cfg.user; group = cfg.group; };
       users.groups.dehydrated = { name = cfg.group; };
 
-      services.dehydrated.domains = genAttrs (attrNames cfg.https) (const []);
+      services.dehydrated.domains = lib.genAttrs (lib.attrNames cfg.https) (lib.const []);
 
-      services.nginx.httpConfig = concatStrings (
-        mapAttrsToList (domain: serverConfig: optionalString (serverConfig != "" || (cfg.https.${domain} or "") != "") ''
+      services.nginx.httpConfig = lib.concatStrings (
+        lib.mapAttrsToList (domain: serverConfig: lib.optionalString (serverConfig != "" || (cfg.https.${domain} or "") != "") ''
           server {
             deny 54.87.234.78;
             deny 5.188.62.26;
@@ -99,7 +97,7 @@ in {
             '' + serverConfig}
           }
         '') cfg.http ++
-        mapAttrsToList (domain: serverConfig: optionalString (serverConfig != "") ''
+        lib.mapAttrsToList (domain: serverConfig: lib.optionalString (serverConfig != "") ''
           server {
             deny 54.87.234.78;
             deny 5.188.62.26;

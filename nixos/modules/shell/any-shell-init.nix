@@ -1,7 +1,5 @@
 { config, lib, ... }:
 
-with lib;
-
 let
   cfg = config.environment;
 
@@ -19,7 +17,7 @@ let
   '';
 
 in {
-  options.environment.anyShellInit = with types; mkOption {
+  options.environment.anyShellInit = with types; lib.mkOption {
     type = lines;
     description = ''
       Shell script code called during any shell initialization.
@@ -34,7 +32,7 @@ in {
     interactiveShellInit = guardedAnyShellInit;
 
     variables.BASH_ENV = "/etc/bashenv";
-    etc.bashenv.text = mkBefore shellEnv;
-    etc.zshenv.text = mkIf config.programs.zsh.enable (mkBefore shellEnv);
+    etc.bashenv.text = lib.mkBefore shellEnv;
+    etc.zshenv.text = lib.mkIf config.programs.zsh.enable (lib.mkBefore shellEnv);
   };
 }

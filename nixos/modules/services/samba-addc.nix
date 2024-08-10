@@ -1,13 +1,11 @@
 { config, lib, pkgs, ... }:
 
-with lib;
-
 let
   cfg = config.services.samba-addc;
 
-  sambaToString = x: if builtins.typeOf x == "bool" then if x then "yes" else "no" else toString x;
+  sambaToString = x: if builtins.typeOf x == "bool" then if x then "yes" else "no" else lib.toString x;
 
-  shareConfig = name: let share = getAttr name cfg.shares; in ''
+  shareConfig = name: let share = lib.getAttr name cfg.shares; in ''
     [${name}]
     ${concatStrings (map (key: ''
       ${"  "}${key} = ${sambaToString share.${key}}
@@ -26,9 +24,9 @@ let
 
 in {
   options.services.samba-addc = with types; {
-    enable = mkEnableOption "Samba server";
+    enable = lib.mkEnableOption "Samba server";
 
-    package = mkOption {
+    package = lib.mkOption {
       type = package;
       default = pkgs.samba-addc;
       defaultText = "pkgs.samba-addc";
@@ -37,8 +35,8 @@ in {
       '';
     };
 
-    configFile = mkOption {
-      type = nullOr path;
+    configFile = lib.mkOption {
+      type = lib.nullOr path;
       default = null;
       description = ''
         The Samba server config file <literal>smb.conf</literal>.
@@ -47,7 +45,7 @@ in {
       '';
     };
 
-    extraConfig = mkOption {
+    extraConfig = lib.mkOption {
       type = lines;
       default = "";
       description = ''
@@ -60,7 +58,7 @@ in {
     };
 
     shares = mkOption {
-      type = attrsOf (attrsOf unspecified);
+      type = lib.attrsOf (lib.attrsOf unspecified);
       default = {};
       description = ''
         A set describing shared resources. See <command>man smb.conf</command> for options.
@@ -77,7 +75,7 @@ in {
     };
   };
 
-  config = mkIf cfg.enable {
+  config = lib.mkIf cfg.enable {
     environment.etc."samba-addc/smb.conf".source = configFile;
 
     environment.systemPackages = [ cfg.package ];

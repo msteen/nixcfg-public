@@ -1,14 +1,12 @@
 { config, lib, pkgs, ... }:
 
-with lib;
-
 let
   cfg = config.boot.initrd.udev;
 
 in {
   options = {
     boot.initrd.udev = with types; {
-      extraRules = mkOption {
+      extraRules = lib.mkOption {
         type = lines;
         default = "";
         description = ''
@@ -18,7 +16,7 @@ in {
     };
   };
 
-  config = mkIf (cfg.extraRules != "") {
+  config = lib.mkIf (cfg.extraRules != "") {
     boot.initrd = {
       extraUdevRulesCommands = let extraUdevRules = pkgs.writeTextDir "99-local.rules" cfg.extraRules; in ''
         cp -v ${extraUdevRules}/*.rules $out/
